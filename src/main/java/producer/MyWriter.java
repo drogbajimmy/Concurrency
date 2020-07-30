@@ -1,7 +1,8 @@
 package producer;
 
+import queue.MyQueue;
+
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Writer class
@@ -13,9 +14,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class MyWriter implements Runnable {
 
     private List<Integer> nums;
-    private ConcurrentLinkedQueue<Integer> myQueue;
+    private MyQueue<Integer> myQueue;
 
-    public MyWriter(ConcurrentLinkedQueue<Integer> myQueue, List<Integer> nums) {
+    public MyWriter(MyQueue<Integer> myQueue, List<Integer> nums) {
         this.myQueue = myQueue;
         this.nums = nums;
     }

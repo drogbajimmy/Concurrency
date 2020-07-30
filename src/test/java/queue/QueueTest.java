@@ -1,3 +1,5 @@
+package queue;
+
 import consumer.MyReader;
 import org.junit.Test;
 import producer.MyWriter;
@@ -20,7 +22,7 @@ public class QueueTest {
 
     @Test
     public void testPushAndPop() {
-        ConcurrentLinkedQueue<Integer> queue = new ConcurrentLinkedQueue<>();
+        MyQueue<Integer> queue = new MyQueue<>();
         List<Integer> list1 = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
         List<Integer> list2 = Arrays.asList(10, 11, 12, 13, 14, 15, 16, 17, 18, 19);
         List<Integer> list3 = Arrays.asList(20, 21, 22, 23, 24, 25, 26, 27, 28, 29);
@@ -38,9 +40,31 @@ public class QueueTest {
         Thread t3 = new Thread(writer03, "producer3");
         Thread t4 = new Thread(writer04, "producer4");
 
+        Callable<List<Integer>> callable01 = new MyReader(queue);
+        Callable<List<Integer>> callable02 = new MyReader(queue);
+        Callable<List<Integer>> callable03 = new MyReader(queue);
+
         executor.execute(t1);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Future<List<Integer>> future01 = executor.submit(callable01);
+
         executor.execute(t2);
         executor.execute(t3);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Future<List<Integer>> future02 = executor.submit(callable02);
+
         executor.execute(t4);
 
         try {
@@ -49,13 +73,6 @@ public class QueueTest {
             e.printStackTrace();
         }
 
-        assertEquals(40, queue.size());
-
-        Callable<List<Integer>> callable01 = new MyReader(queue);
-        Callable<List<Integer>> callable02 = new MyReader(queue);
-        Callable<List<Integer>> callable03 = new MyReader(queue);
-        Future<List<Integer>> future01 = executor.submit(callable01);
-        Future<List<Integer>> future02 = executor.submit(callable02);
         Future<List<Integer>> future03 = executor.submit(callable03);
 
         while(!(future01.isDone() && future02.isDone() && future03.isDone())) {
@@ -73,8 +90,11 @@ public class QueueTest {
 
         try {
             list01 = future01.get();
+//            System.out.println("list01 -> " + list01.size());
             list02 = future02.get();
+//            System.out.println("list02 -> " + list02.size());
             list03 = future03.get();
+//            System.out.println("list03 -> " + list03.size());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -86,6 +106,7 @@ public class QueueTest {
         int[] arr = result.stream().mapToInt(i -> i).toArray();
         assertEquals(40, arr.length);
         Arrays.sort(arr);
+//        System.out.println(Arrays.toString(arr));
         for (int i=0; i<arr.length; ++i) {
             assertEquals(i, arr[i]);
         }
@@ -95,7 +116,7 @@ public class QueueTest {
 
     @Test
     public void testPopFromEmptyQueue() {
-        ConcurrentLinkedQueue<Integer> queue = new ConcurrentLinkedQueue<>();
+        MyQueue<Integer> queue = new MyQueue<>();
         List<Integer> list1 = new ArrayList<>();
         List<Integer> list2 = new ArrayList<>();
         List<Integer> list3 = new ArrayList<>();

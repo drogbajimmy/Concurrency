@@ -1,9 +1,10 @@
 package consumer;
 
+import queue.MyQueue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Reader class
@@ -14,9 +15,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class MyReader implements Callable<List<Integer>> {
 
-    private ConcurrentLinkedQueue<Integer> myQueue;
+    private MyQueue<Integer> myQueue;
 
-    public MyReader(ConcurrentLinkedQueue<Integer> myQueue) {
+    public MyReader(MyQueue<Integer> myQueue) {
         this.myQueue = myQueue;
     }
 
