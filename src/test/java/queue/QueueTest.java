@@ -40,73 +40,22 @@ public class QueueTest {
         Thread t3 = new Thread(writer03, "producer3");
         Thread t4 = new Thread(writer04, "producer4");
 
-        Callable<List<Integer>> callable01 = new MyReader(queue);
-        Callable<List<Integer>> callable02 = new MyReader(queue);
-        Callable<List<Integer>> callable03 = new MyReader(queue);
-
         executor.execute(t1);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Future<List<Integer>> future01 = executor.submit(callable01);
-
         executor.execute(t2);
         executor.execute(t3);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Future<List<Integer>> future02 = executor.submit(callable02);
-
         executor.execute(t4);
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        List<Integer> result = new ArrayList<>();
+        int totalSize = list1.size() + list2.size() + list3.size() + list4.size();
+        while(result.size() < totalSize) {
+            MyReader reader = new MyReader(queue);
+            List<Integer> tmpResult = reader.read();
+            result.addAll(tmpResult);
         }
-
-        Future<List<Integer>> future03 = executor.submit(callable03);
-
-        while(!(future01.isDone() && future02.isDone() && future03.isDone())) {
-            System.out.println("Reading...");
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        List<Integer> list01 = new ArrayList<>();
-        List<Integer> list02 = new ArrayList<>();
-        List<Integer> list03 = new ArrayList<>();
-
-        try {
-            list01 = future01.get();
-//            System.out.println("list01 -> " + list01.size());
-            list02 = future02.get();
-//            System.out.println("list02 -> " + list02.size());
-            list03 = future03.get();
-//            System.out.println("list03 -> " + list03.size());
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        List<Integer> result = new ArrayList<>(list01);
-        result.addAll(list02);
-        result.addAll(list03);
 
         int[] arr = result.stream().mapToInt(i -> i).toArray();
         assertEquals(40, arr.length);
         Arrays.sort(arr);
-//        System.out.println(Arrays.toString(arr));
         for (int i=0; i<arr.length; ++i) {
             assertEquals(i, arr[i]);
         }
@@ -121,6 +70,7 @@ public class QueueTest {
         List<Integer> list2 = new ArrayList<>();
         List<Integer> list3 = new ArrayList<>();
         List<Integer> list4 = new ArrayList<>();
+
 
         MyWriter writer01 = new MyWriter(queue, list1);
         MyWriter writer02 = new MyWriter(queue, list2);
@@ -139,45 +89,13 @@ public class QueueTest {
         executor.execute(t3);
         executor.execute(t4);
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        List<Integer> result = new ArrayList<>();
+        int totalSize = list1.size() + list2.size() + list3.size() + list4.size();
+        while(result.size() < totalSize) {
+            MyReader reader = new MyReader(queue);
+            List<Integer> tmpResult = reader.read();
+            result.addAll(tmpResult);
         }
-
-        assertEquals(0, queue.size());
-
-        Callable<List<Integer>> callable01 = new MyReader(queue);
-        Callable<List<Integer>> callable02 = new MyReader(queue);
-        Callable<List<Integer>> callable03 = new MyReader(queue);
-        Future<List<Integer>> future01 = executor.submit(callable01);
-        Future<List<Integer>> future02 = executor.submit(callable02);
-        Future<List<Integer>> future03 = executor.submit(callable03);
-
-        while(!(future01.isDone() && future02.isDone() && future03.isDone())) {
-            System.out.println("Reading...");
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        List<Integer> list01 = new ArrayList<>();
-        List<Integer> list02 = new ArrayList<>();
-        List<Integer> list03 = new ArrayList<>();
-
-        try {
-            list01 = future01.get();
-            list02 = future02.get();
-            list03 = future03.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        List<Integer> result = new ArrayList<>(list01);
-        result.addAll(list02);
-        result.addAll(list03);
 
         int[] arr = result.stream().mapToInt(i -> i).toArray();
         assertEquals(0, arr.length);

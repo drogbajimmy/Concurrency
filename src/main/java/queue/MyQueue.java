@@ -4,47 +4,69 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Main queue class
+ *
+ * @author  Jimmy Zhou
+ * @version 1.0
+ * @since   2020-07-30
+ */
 public class MyQueue<E> {
 
     private int count;
     private LinkedList<E> list = new LinkedList<>();
-    private final ReentrantLock putLock = new ReentrantLock();
-    private final ReentrantLock takeLock = new ReentrantLock();
+    private final ReentrantLock queueLock = new ReentrantLock();
 
+    /**
+     * Returns the number of elements in this queue.
+     *
+     * @return the number of elements in this queue
+     */
     public int size() {
         return count;
     }
 
+    /**
+     * Returns if this collection contains no elements.
+     *
+     * @return true if this collection contains no elements
+     */
     public boolean isEmpty() {
         return count == 0;
     }
 
-    public boolean contains(E o) {
-
-        if (o == null) return false;
-        fullyLock();
-        try {
-            return list.contains(o);
-        } finally {
-            fullyUnlock();
-        }
-    }
-
+    /**
+     * Inserts the specified element into this queue, returning
+     * <tt>true</tt>
+     *
+     * @param o the element to add
+     * @return true
+     */
     public boolean add(E o) {
 
-        final ReentrantLock putLock = this.putLock;
+        final ReentrantLock queueLock = this.queueLock;
 
         try {
-            putLock.lock();
+            queueLock.lock();
             list.add(o);
             count++;
 
             return true;
         } finally {
-            putLock.unlock();
+            queueLock.unlock();
         }
     }
 
+    /**
+     * Adds all of the elements in the specified collection to this
+     * queue.
+     *
+     * @param c collection containing elements to be added to this queue
+     * @return true if this queue changed as a result of the call
+     * @throws NullPointerException if the specified collection contains a
+     *         null element and this queue does not permit null elements,
+     *         or if the specified collection is null
+     */
     public boolean addAll(Collection<E> c) {
 
         if (c == null) throw new NullPointerException();
@@ -59,14 +81,15 @@ public class MyQueue<E> {
         return modified;
     }
 
-    public void clear() {
-        while (poll() != null)
-            ;
-    }
-
+    /**
+     * Retrieves and removes the head of this queue,
+     * or returns null if this queue is empty.
+     *
+     * @return the head of this queue, or null if this queue is empty
+     */
     public E poll() {
-        final ReentrantLock takeLock = this.takeLock;
-        takeLock.lock();
+        final ReentrantLock queueLock = this.queueLock;
+        queueLock.lock();
         try {
             if (count == 0) {
                 return null;
@@ -76,23 +99,7 @@ public class MyQueue<E> {
                 return o;
             }
         } finally {
-            takeLock.unlock();
+            queueLock.unlock();
         }
-    }
-
-    /**
-     * Locks to prevent both puts and takes.
-     */
-    void fullyLock() {
-        putLock.lock();
-        takeLock.lock();
-    }
-
-    /**
-     * Unlocks to allow both puts and takes.
-     */
-    void fullyUnlock() {
-        takeLock.unlock();
-        putLock.unlock();
     }
 }

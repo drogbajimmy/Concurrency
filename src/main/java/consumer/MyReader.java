@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
  * @version 1.0
  * @since   2020-07-29
  */
-public class MyReader implements Callable<List<Integer>> {
+public class MyReader {
 
     private MyQueue<Integer> myQueue;
 
@@ -21,8 +21,7 @@ public class MyReader implements Callable<List<Integer>> {
         this.myQueue = myQueue;
     }
 
-    @Override
-    public List<Integer> call() throws Exception {
+    public List<Integer> read() {
 
         List<Integer> nums = new ArrayList<>();
 
